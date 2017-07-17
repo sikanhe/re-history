@@ -106,12 +106,14 @@ let go n => Browser.History.go n;
 let goBack () => go (-1);
 let goForward () => go 1;
 
-let handlePopEvent history (event: Js.t{.
+type popEvent = Js.t{.
   state: Js.null(Js.t{.
     key: string,
-    state: Js.t{..}
+    state: Js.t{.}
   })
-}) => {
+};
+
+let handlePopEvent history (event: popEvent) => {
   switch (Js.Null.to_opt event##state) {
   | None => ()
   | Some state => {
