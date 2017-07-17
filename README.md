@@ -1,3 +1,10 @@
+# Why port to Reason instead of binding? 
+
+✔ Idiomatic Reason usage throughout
+✔ Type checking for all function arguments/returns/options, and location descriptors. 
+✔ Take advantage of Variant types for action types (POP|PUSH|REPLACE) and
+blocker functions (Prompt message | Block| Pass);
+
 # TODO
 
 - [x] push 

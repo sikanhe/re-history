@@ -1,7 +1,7 @@
 type action = 
-  | POP 
-  | PUSH
-  | REPLACE;
+  | Pop 
+  | Push
+  | Replace;
 
 type location = {
   search: string,
@@ -26,9 +26,9 @@ type t = {
 };
 
 let actionToString = fun
-| POP => "POP"
-| PUSH => "PUSH"
-| REPLACE => "REPLACE";
+| Pop => "POP"
+| Push => "PUSH"
+| Replace => "REPLACE";
 
 let getDomLocation state => {
   let browserLocation = Browser.location;
@@ -114,7 +114,7 @@ let handlePopEvent history (event: Js.t{.
   switch (Js.Null.to_opt event##state) {
   | None => ()
   | Some state => {
-    let action = POP;
+    let action = Pop;
     let key = state##key; 
     let state = state##state; 
     let location = getDomLocation({"key": key, "state": state}); 
@@ -146,10 +146,10 @@ let change ::forceRefresh=false ::state history action path => {
       history.length = Browser.History.getLength browserHistory;
       history.location = newLocation;
     }
-    | (true, REPLACE, _) => {
+    | (true, Replace, _) => {
       Browser.Location.replace Browser.location path;
     }
-    | (true, PUSH, _) => {
+    | (true, Push, _) => {
       Browser.Location.setHref Browser.location path;
     }
     | _ => ()
@@ -157,10 +157,10 @@ let change ::forceRefresh=false ::state history action path => {
 };
 
 let push ::forceRefresh=false ::state=? history path => 
-  change history PUSH path ::state ::forceRefresh;
+  change history Push path ::state ::forceRefresh;
 
 let replace ::forceRefresh=false ::state=? history path => 
-  change history REPLACE path ::state ::forceRefresh;
+  change history Replace path ::state ::forceRefresh;
 
 let createBrowserHistory ::keyLength=8 ::forceRefresh=false () => {
   let key = createKey length::keyLength(); 
@@ -173,7 +173,7 @@ let createBrowserHistory ::keyLength=8 ::forceRefresh=false () => {
 
   let history = {
     length: 0,
-    action: POP,
+    action: Pop,
     location: initLocation,
     listeners: [],
     blockers: [],
