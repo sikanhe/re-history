@@ -15,6 +15,7 @@ blocker functions (Prompt message | Block| Pass);
 - [x] listen/unlisten
 - [x] block/unblock
 - [x] createHref
+- [ ] basename
 - [ ] createHashHistory
 
 # Example Usage 
