@@ -1,0 +1,22 @@
+{
+  "name": "re-history",
+  "version": "0.1.0",
+  "description": "Reason Implementation of History package",
+  "scripts": {
+    "start": "bsb -w",
+    "clean": "bsb -clean-world",
+    "build": "bsb -make-world",
+    "watch": "bsb -make-world -w"
+  },
+  "keywords": [
+    "BuckleScript",
+    "Reason",
+    "ReasonML",
+    "History",
+    "Router"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "bs-platform": "^1.8.0"
+  }
+}
