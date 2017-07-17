@@ -31,9 +31,10 @@ let unblock = block history (fun action location => {
 }); 
 
 /* This will show a prompt before transitioning */
-push history "/route1?query=yolo#someid" state::{"first": "state"}; 
+push history "/route1?query=yolo#someid"; 
 
 unblock (); 
 
+/* Can also pass in a state JS object*/
 push history "/route2#someid" state::{"second": "state"}; 
 ```
