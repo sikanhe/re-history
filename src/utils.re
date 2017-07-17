@@ -1,13 +1,13 @@
 type location = {
-  pathname: string, 
-  hash: string, 
+  pathname: string,
+  hash: string,
   search: string
 };
 
-let parsePath = fun 
+let parsePath = fun
 | ""  => {pathname: "/", hash: "", search: ""}
 | path => {
-  let (hash, pathname) = 
+  let (hash, pathname) =
     if (String.contains path '#') {
       let hashIndex = String.index path '#';
       let hashLength = (String.length path) - hashIndex;
@@ -18,7 +18,7 @@ let parsePath = fun
       ("", path)
     };
 
-  let (search, pathname) = 
+  let (search, pathname) =
     if (String.contains pathname '?') {
       let searchIndex = String.index pathname '?';
       let searchLength = (String.length pathname) - searchIndex;
@@ -28,9 +28,9 @@ let parsePath = fun
     } else {
       ("", pathname)
     };
-    
+
   {
-    pathname: pathname, 
+    pathname: pathname,
     search: search,
     hash: hash,
   };

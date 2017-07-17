@@ -1,5 +1,5 @@
-type action = 
-  | Pop 
+type action =
+  | Pop
   | Push
   | Replace;
 
@@ -9,17 +9,17 @@ type location = {
   hash: string,
   key: string
 };
-  
-type blockerReturn = 
-  | Prompt string 
+
+type blockerReturn =
+  | Prompt string
   | Block
-  | Pass;  
-  
+  | Pass;
+
 type t = {
   mutable length: int,
   mutable action: action,
   mutable location: location,
-  mutable listeners: list (action => location => unit),  
+  mutable listeners: list (action => location => unit),
   mutable blockers: list (action => location => blockerReturn),
   keyLength: int,
   forceRefresh: bool
@@ -47,13 +47,13 @@ let createLocation path key => {
 
 let createHref = fun
 | {pathname, search: "", hash: ""} => pathname
-| {pathname, search, hash: ""} => pathname ^ search 
-| {pathname, hash, search: ""} => pathname ^ hash 
+| {pathname, search, hash: ""} => pathname ^ search
+| {pathname, hash, search: ""} => pathname ^ hash
 | {pathname, hash, search} => pathname ^ search ^ hash;
 
 let createKey ::length=8 () => {
   let alpha = "1234567890abcdefghijk";
-  let key = ref ""; 
+  let key = ref "";
   let bound = String.length alpha;
   for _n in 0 to length {
     let rand = Random.int bound;
@@ -78,24 +78,25 @@ let notifyListeners listeners action location => {
 
 let unblock history blocker () => {
   history.blockers = List.filter (fun bl => bl !== blocker) history.blockers;
-}; 
+};
 
 let block history blocker => {
-  history.blockers = [blocker, ...history.blockers]; 
+  unblock history blocker ();
+  history.blockers = [blocker, ...history.blockers];
   unblock history blocker;
-}; 
+};
 
 let rec checkWithBlockers blockers action location => {
   switch blockers {
-    | [] => true 
+    | [] => true
     | [blocker, ...rest] => {
-      let didThisPass = 
+      let didThisPass =
         switch (blocker action location) {
           | Pass => true
           | Block => false
           | Prompt message => Browser.confirm message;
-        }; 
-      
+        };
+
       didThisPass && (checkWithBlockers rest action location)
     }
   };
@@ -105,9 +106,9 @@ let go n => Browser.History.go n;
 let goBack () => go (-1);
 let goForward () => go 1;
 
-let handlePopEvent history (event: Js.t{. 
-  state: Js.null(Js.t{. 
-    key: string, 
+let handlePopEvent history (event: Js.t{.
+  state: Js.null(Js.t{.
+    key: string,
     state: Js.t{..}
   })
 }) => {
@@ -115,11 +116,11 @@ let handlePopEvent history (event: Js.t{.
   | None => ()
   | Some state => {
     let action = Pop;
-    let key = state##key; 
-    let state = state##state; 
-    let location = getDomLocation({"key": key, "state": state}); 
-    history.location = location; 
-    history.action = action; 
+    let key = state##key;
+    let state = state##state;
+    let location = getDomLocation({"key": key, "state": state});
+    history.location = location;
+    history.action = action;
     notifyListeners history.listeners action location;
   }
   };
@@ -131,14 +132,14 @@ let change ::forceRefresh=false ::state history action path => {
   let newLocation = createLocation path key;
   let shouldRefresh = forceRefresh || history.forceRefresh;
   let shouldContinue = checkWithBlockers blockers action newLocation;
-  
+
   switch (shouldContinue, action, shouldRefresh) {
-    | (true, action, false) => { 
+    | (true, action, false) => {
       let browserHistory = Browser.history;
       let state = switch state {
       | None => (Browser.History.getState browserHistory)##state
       | Some state => state
-      }; 
+      };
 
       notifyListeners listeners action newLocation;
       Browser.History.pushState {"key": key, "state": state} Js.Null.empty path;
@@ -156,20 +157,20 @@ let change ::forceRefresh=false ::state history action path => {
   };
 };
 
-let push ::forceRefresh=false ::state=? history path => 
+let push ::forceRefresh=false ::state=? history path =>
   change history Push path ::state ::forceRefresh;
 
-let replace ::forceRefresh=false ::state=? history path => 
+let replace ::forceRefresh=false ::state=? history path =>
   change history Replace path ::state ::forceRefresh;
 
 let createBrowserHistory ::keyLength=8 ::forceRefresh=false () => {
-  let key = createKey length::keyLength(); 
+  let key = createKey length::keyLength();
   let initLocation = getDomLocation {"key": key};
 
   /* Push in a initial state so handlepop does skip POP back to initial page */
   let initState = {"key": key, "state": Js.Null.empty};
   let initPath = Browser.location##href;
-  Browser.History.replaceState initState Js.Null.empty initPath;  
+  Browser.History.replaceState initState Js.Null.empty initPath;
 
   let history = {
     length: 0,
@@ -177,7 +178,7 @@ let createBrowserHistory ::keyLength=8 ::forceRefresh=false () => {
     location: initLocation,
     listeners: [],
     blockers: [],
-    keyLength, 
+    keyLength,
     forceRefresh,
   };
 
