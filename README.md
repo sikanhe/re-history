@@ -13,8 +13,9 @@ blocker functions (Prompt message | Block| Pass);
 - [x] replace 
 - [x] createBrowserHistory 
 - [x] listen/unlisten
-- [x] block/unblock
+- [x] block/unblock (for push/replace)
 - [x] createHref
+- [ ] block for POPs
 - [ ] basename
 - [ ] createHashHistory
 
