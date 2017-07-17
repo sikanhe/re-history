@@ -14,15 +14,20 @@
 open History;
 
 let history = createBrowserHistory ();
+
 let unsub = subscribe history (fun action location => {
   Js.log (actionToString action);
   Js.log location.key; 
   Js.log (Browser.History.getState Browser.history);
 });
 
-/* blocker function can return either | Prompt message | Block | Skip  */
 let unblock = block history (fun action location => {
+  /* Return `Prompt message` variant to show a `window.confirm` prompt */
   Prompt ("You sure you want to" ^ actionToString(action) ^ "to " ^ createHref(location) ^ "?");
+  /* or just block this transition */
+  Block
+  /* or let it pass */
+  Pass
 }); 
 
 /* This will show a prompt before transitioning */

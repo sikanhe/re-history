@@ -13,7 +13,7 @@ type location = {
 type blockerReturn = 
   | Prompt string 
   | Block
-  | Skip;  
+  | Pass;  
   
 type t = {
   mutable length: int,
@@ -57,7 +57,7 @@ let createKey ::length=8 () => {
   let bound = String.length alpha;
   for _n in 0 to length {
     let rand = Random.int bound;
-    key := !key ^ (String.sub alpha rand 1);
+    key := key.contents ^ (String.sub alpha rand 1);
   };
   key.contents
 };
@@ -91,7 +91,7 @@ let rec checkWithBlockers blockers action location => {
     | [blocker, ...rest] => {
       let didThisPass = 
         switch (blocker action location) {
-          | Skip => true
+          | Pass => true
           | Block => false
           | Prompt message => Browser.confirm message;
         }; 
@@ -129,10 +129,11 @@ let change ::forceRefresh=false ::state history action path => {
   let { keyLength, listeners, blockers } = history;
   let key = createKey length::keyLength ();
   let newLocation = createLocation path key;
-
+  let shouldRefresh = forceRefresh || history.forceRefresh;
   let shouldContinue = checkWithBlockers blockers action newLocation;
-  switch (shouldContinue, action, forceRefresh, history.forceRefresh) {
-    | (true, action, false, false) => { 
+  
+  switch (shouldContinue, action, shouldRefresh) {
+    | (true, action, false) => { 
       let browserHistory = Browser.history;
       let state = switch state {
       | None => (Browser.History.getState browserHistory)##state
@@ -145,10 +146,10 @@ let change ::forceRefresh=false ::state history action path => {
       history.length = Browser.History.getLength browserHistory;
       history.location = newLocation;
     }
-    | (true, REPLACE, _, _) => {
+    | (true, REPLACE, _) => {
       Browser.Location.replace Browser.location path;
     }
-    | (true, PUSH, _, _) => {
+    | (true, PUSH, _) => {
       Browser.Location.setHref Browser.location path;
     }
     | _ => ()
