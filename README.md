@@ -1,4 +1,14 @@
-##Example Usage 
+# TODO
+
+- [x] push 
+- [x] replace 
+- [x] createBrowserHistory 
+- [x] listen/unlisten
+- [x] block/unblock
+- [x] createHref
+- [ ] createHashHistory
+
+# Example Usage 
 
 ```reason
 open History;
