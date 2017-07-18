@@ -108,10 +108,6 @@ let go n => Browser.History.go n;
 let goBack () => go (-1);
 let goForward () => go 1;
 
-type popEvent 'a = Js.t{.
-  state: Js.undefined('a)
-};
-
 /**
  * Returns true if a given popstate event is an extraneous WebKit event.
  * Accounts for the fact that Chrome on iOS fires real popstate events
@@ -122,7 +118,7 @@ type popEvent 'a = Js.t{.
      | None => ()
      | Some state => {
         let action = Pop;
-        let location = getDomLocation state##key (Some state);
+        let location = getDomLocation state##key state##state;
         history.location = location;
         history.action = action;
         notifyListeners history.listeners action location;
