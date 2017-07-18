@@ -115,9 +115,15 @@ let goForward () => go 1;
      | Some state => {
         let action = Pop;
         let location = getDomLocation state##key state##state;
-        history.location = location;
-        history.action = action;
-        notifyListeners history.listeners action location;
+
+        if (checkWithBlockers history.blockers action location) {
+          history.location = location;
+          history.action = action;
+          notifyListeners history.listeners action location;
+        } else {
+          let oldHref = createHref history.location;
+          Browser.History.replaceState state Js.Null.empty oldHref;
+        }
      }
    };
 };
