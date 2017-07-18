@@ -158,14 +158,9 @@ let push ::forceRefresh=false ::state=? history path =>
 let replace ::forceRefresh=false ::state=? history path =>
   change history Replace path state ::forceRefresh;
 
-let createBrowserHistory ::keyLength=8 ::forceRefresh=false ::initialState=? () => {
+let createBrowserHistory ::keyLength=8 ::forceRefresh=false () => {
   let key = createKey length::keyLength();
-  let initLocation = getDomLocation key initialState;
-  let browserState = {"key": key, "state": initialState};
-
-  /* Push in a initial state so handlepop catches POP'ing back to initial page */
-  let initPath = Browser.location##href;
-  Browser.History.replaceState browserState Js.Null.empty initPath;
+  let initLocation = getDomLocation key None;
 
   let history = {
     length: 0,
