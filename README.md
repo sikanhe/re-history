@@ -41,6 +41,8 @@ let unsub = History.subscribe history (fun action location => {
   logState location.state
 });
 
+push history "/route1#someid";
+
 let unblock = History.block history (fun _action _location => {
   /* Callback function can return either */
   Prompt "You sure you sure??";
@@ -49,9 +51,6 @@ let unblock = History.block history (fun _action _location => {
   /* or */
   Pass
 });
-
-
-push history "/route1#someid";
 
 /* This will show a prompt before transitioning */
 push history "/route2" state::{mystate: "state1"};
