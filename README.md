@@ -15,7 +15,7 @@ blocker functions (Prompt message | Block| Pass);
 - [x] listen/unlisten
 - [x] block/unblock (for push/replace)
 - [x] createHref
-- [ ] block for POPs
+- [x] block for POPs
 - [ ] basename
 - [ ] createHashHistory
 
