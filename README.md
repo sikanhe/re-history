@@ -45,7 +45,7 @@ push history "/route1#someid";
 
 let unblock = History.block history (fun _action _location => {
   /* Callback function can return either */
-  Prompt "You sure you sure??";
+  Prompt "Are you sure you want to leave this page??";
   /* or */
   Block
   /* or */
