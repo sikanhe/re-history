@@ -53,8 +53,8 @@ let createHref = fun
 | {pathname, hash, search: ""} => pathname ^ hash
 | {pathname, hash, search} => pathname ^ search ^ hash;
 
-let createKey ::length=8 () => {
-  let alpha = "1234567890abcdefghijk";
+let createKey ::length=6 () => {
+  let alpha = "1234567890abcdefghijklmnopqrstuvwxyz";
   let key = ref "";
   let bound = String.length alpha;
   for _n in 0 to length {
