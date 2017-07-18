@@ -24,32 +24,29 @@ blocker functions (Prompt message | Block| Pass);
 ```reason
 open History;
 
+/* Example usages  */
 type state = {mystate: string};
 
 let history = createBrowserHistory ();
-
 let unsub = subscribe history (fun action location => {
   Js.log (actionToString action);
   Js.log location.key;
-  Js.log (Browser.History.getState Browser.history);
+  /* location.state is a variant of | Some state and | None  */
+  switch location.state {
+  | Some {mystate: state} => Js.log state;
+  | None => Js.log "no state";
+  }
 });
 
+/* callback function can return either | Prompt message | Block | Skip  */
 let unblock = block history (fun action location => {
-  /* Return `Prompt message` variant to show a `window.confirm` prompt */
   Prompt ("You sure you want to" ^ actionToString(action) ^ "to " ^ createHref(location) ^ "?");
-  /* or just block this transition */
-  Block
-  /* or let it pass */
-  Pass
 });
 
 /* This will show a prompt before transitioning */
-push history "/route1?query=yolo#someid";
+push history "/route1?query=yolo#someid" state::{mystate: "state1"};
 
 unblock ();
 
-/* Can also pass in a state JS object*/
-push history "/route2#someid" state::{mystate: "second state"};
+push history "/route2#someid";
 ```
-/* explicitly set the state to null */
-push history "/route2#someid"
