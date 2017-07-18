@@ -15,6 +15,7 @@
     "History",
     "Router"
   ],
+  "main": "src/history.re",
   "license": "MIT",
   "devDependencies": {
     "bs-platform": "^1.8.0"

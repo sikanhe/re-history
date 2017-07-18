@@ -3,11 +3,12 @@ type action =
   | Push
   | Replace;
 
-type location = {
+type location 'a = {
   search: string,
   pathname: string,
   hash: string,
-  key: string
+  key: string,
+  state: 'a
 };
 
 type blockerReturn =
@@ -15,12 +16,12 @@ type blockerReturn =
   | Block
   | Pass;
 
-type t = {
+type t 'a = {
   mutable length: int,
   mutable action: action,
-  mutable location: location,
-  mutable listeners: list (action => location => unit),
-  mutable blockers: list (action => location => blockerReturn),
+  mutable location: location 'a,
+  mutable listeners: list (action => location 'a => unit),
+  mutable blockers: list (action => location 'a => blockerReturn),
   keyLength: int,
   forceRefresh: bool
 };
@@ -30,19 +31,20 @@ let actionToString = fun
 | Push => "PUSH"
 | Replace => "REPLACE";
 
-let getDomLocation state => {
+let getDomLocation key state=> {
   let browserLocation = Browser.location;
   {
     pathname: browserLocation##pathname,
     hash: browserLocation##hash,
     search: browserLocation##search,
-    key: state##key
+    key,
+    state
   };
 };
 
-let createLocation path key => {
+let createLocation path key state => {
   let {Utils.pathname, search, hash} = Utils.parsePath path;
-  {key, pathname, hash, search};
+  {key, pathname, hash, search, state};
 };
 
 let createHref = fun
@@ -106,42 +108,37 @@ let go n => Browser.History.go n;
 let goBack () => go (-1);
 let goForward () => go 1;
 
-type popEvent = Js.t{.
-  state: Js.null(Js.t{.
-    key: string,
-    state: Js.t{.}
-  })
+type popEvent 'a = Js.t{.
+  state: Js.null(Browser.History.state 'a)
 };
 
-let handlePopEvent history (event: popEvent) => {
+let handlePopEvent history event => {
   switch (Js.Null.to_opt event##state) {
-  | None => ()
-  | Some state => {
-    let action = Pop;
-    let key = state##key;
-    let state = state##state;
-    let location = getDomLocation({"key": key, "state": state});
-    history.location = location;
-    history.action = action;
-    notifyListeners history.listeners action location;
-  }
+    | None => ()
+    | Some browserState => {
+      let action = Pop;
+      let location = getDomLocation browserState##key (Js.Null.to_opt browserState##state);
+      history.location = location;
+      history.action = action;
+      notifyListeners history.listeners action location;
+    }
   };
 };
 
-let change ::forceRefresh=false ::state history action path => {
-  let { keyLength, listeners, blockers } = history;
+let change ::forceRefresh=false history action path state=> {
+  let { keyLength, listeners, blockers, location: prevLocation } = history;
   let key = createKey length::keyLength ();
-  let newLocation = createLocation path key;
+  let newState = switch state {
+    | Some _state => state
+    | None => prevLocation.state
+  };
+  let newLocation = createLocation path key newState;
   let shouldRefresh = forceRefresh || history.forceRefresh;
   let shouldContinue = checkWithBlockers blockers action newLocation;
 
   switch (shouldContinue, action, shouldRefresh) {
     | (true, action, false) => {
       let browserHistory = Browser.history;
-      let state = switch state {
-      | None => (Browser.History.getState browserHistory)##state
-      | Some state => state
-      };
 
       notifyListeners listeners action newLocation;
       Browser.History.pushState {"key": key, "state": state} Js.Null.empty path;
@@ -160,19 +157,19 @@ let change ::forceRefresh=false ::state history action path => {
 };
 
 let push ::forceRefresh=false ::state=? history path =>
-  change history Push path ::state ::forceRefresh;
+  change history Push path state ::forceRefresh;
 
 let replace ::forceRefresh=false ::state=? history path =>
-  change history Replace path ::state ::forceRefresh;
+  change history Replace path state ::forceRefresh;
 
-let createBrowserHistory ::keyLength=8 ::forceRefresh=false () => {
+let createBrowserHistory ::keyLength=8 ::forceRefresh=false ::initialState=? () => {
   let key = createKey length::keyLength();
-  let initLocation = getDomLocation {"key": key};
+  let initLocation = getDomLocation key initialState;
+  let browserState = {"key": key, "state": initialState};
 
   /* Push in a initial state so handlepop catches POP'ing back to initial page */
-  let initState = {"key": key, "state": Js.Null.empty};
   let initPath = Browser.location##href;
-  Browser.History.replaceState initState Js.Null.empty initPath;
+  Browser.History.replaceState browserState Js.Null.empty initPath;
 
   let history = {
     length: 0,

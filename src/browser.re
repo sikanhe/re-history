@@ -7,12 +7,13 @@ module Location = {
 
 module History = {
   type t;
+  type state 'a = Js.t{. key: string, state: 'a};
+
   external getLength: t => int = "length" [@@bs.get];
-  external getState: t => Js.t{..} = "state" [@@bs.get];
-  external setState: t => Js.t{..} => unit = "state" [@@bs.set];
-  external pushState: Js.t{..} => Js.null string => string => unit = "window.history.pushState"
+  external getState: t => state 'a = "state" [@@bs.get];
+  external pushState: state 'a => Js.null string => string => unit = "window.history.pushState"
   [@@bs.val];
-  external replaceState: Js.t{..} => Js.null string => string => unit = "window.history.pushState"
+  external replaceState: state 'a => Js.null string => string => unit = "window.history.pushState"
   [@@bs.val];
   external go: int => unit = "window.history.go"
   [@@bs.val];
