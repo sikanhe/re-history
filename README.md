@@ -33,6 +33,11 @@ let logState = fun
 | Some {mystate: value} => Js.log "Current state value: " ^ value
 | None => Js.log "No state";
 
+let actionToString = fun
+| Pop => "POP"
+| Push => "PUSH"
+| Replace => "REPLACE";
+
 let history = History.createBrowserHistory ();
 
 let unsub = History.subscribe history (fun action location => {

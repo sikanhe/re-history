@@ -1,3 +1,8 @@
+type historyType =
+  | Browser
+  | Hash
+  | Memory;
+
 type action =
   | Pop
   | Push
@@ -17,6 +22,7 @@ type blockerReturn =
   | Pass;
 
 type t 'a = {
+  historyType: historyType,
   mutable length: int,
   mutable action: action,
   mutable location: location 'a,
@@ -25,11 +31,6 @@ type t 'a = {
   keyLength: int,
   forceRefresh: bool
 };
-
-let actionToString = fun
-| Pop => "POP"
-| Push => "PUSH"
-| Replace => "REPLACE";
 
 let getDomLocation key state=> {
   let browserLocation = Browser.location;
@@ -162,13 +163,14 @@ let replace ::forceRefresh=false ::state=? history path =>
   change history Replace path state ::forceRefresh;
 
 let createBrowserHistory ::keyLength=8 ::forceRefresh=false () => {
-  let key = createKey length::keyLength();
+  let key = createKey length::keyLength ();
   let initLocation = getDomLocation key None;
 
   /* Set initial history.state  */
   Browser.History.replaceState {"key": key, "state": None} Js.Null.empty Browser.location##href;
 
   let history = {
+    historyType: Browser,
     length: 0,
     action: Pop,
     location: initLocation,
