@@ -46,7 +46,7 @@ let unsub = History.subscribe history (fun action location => {
   logState location.state
 });
 
-push history "/route1#someid";
+History.push history "/route1#someid";
 
 let unblock = History.block history (fun _action _location => {
   /* Callback function can return either */
@@ -58,7 +58,7 @@ let unblock = History.block history (fun _action _location => {
 });
 
 /* This will show a prompt before transitioning */
-push history "/route2" state::{mystate: "state1"};
+History.push history "/route2" state::{mystate: "state1"};
 
 /* Detach listeners */
 unblock ();
