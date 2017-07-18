@@ -50,10 +50,13 @@ let unblock = History.block history (fun _action _location => {
   Pass
 });
 
+
+push history "/route1#someid";
+
 /* This will show a prompt before transitioning */
-push history "/route1?query=yolo#someid" state::{mystate: "state1"};
+push history "/route2" state::{mystate: "state1"};
 
+/* Detach listeners */
 unblock ();
-
-push history "/route2#someid";
+unsub ();
 ```
