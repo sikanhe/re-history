@@ -108,13 +108,9 @@ let go n => Browser.History.go n;
 let goBack () => go (-1);
 let goForward () => go 1;
 
-/**
- * Returns true if a given popstate event is an extraneous WebKit event.
- * Accounts for the fact that Chrome on iOS fires real popstate events
- * containing undefined state when pressing the back button.
- */
  let handlePopEvent history popEvent => {
-   switch (Js.Undefined.to_opt popEvent##state) {
+   /* Event should always have a state or else it is extraneous */
+   switch (Js.Null_undefined.to_opt popEvent##state) {
      | None => ()
      | Some state => {
         let action = Pop;
