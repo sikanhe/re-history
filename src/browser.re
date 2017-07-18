@@ -27,3 +27,4 @@ external addEventListener: domNode => string => (Js.t {..} => unit) => unit
   = "addEventListener" [@@bs.send];
 let onPopState handler => addEventListener window "popstate" handler;
 external confirm: string => bool = "window.confirm" [@@bs.val];
+external getUserAgentIndex: string => int = "navigator.userAgent.indexOf" [@@bs.val];

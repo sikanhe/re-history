@@ -109,20 +109,25 @@ let goBack () => go (-1);
 let goForward () => go 1;
 
 type popEvent 'a = Js.t{.
-  state: Js.null(Browser.History.state 'a)
+  state: Js.undefined('a)
 };
 
-let handlePopEvent history event => {
-  switch (Js.Null.to_opt event##state) {
-    | None => ()
-    | Some browserState => {
-      let action = Pop;
-      let location = getDomLocation browserState##key (Js.Null.to_opt browserState##state);
-      history.location = location;
-      history.action = action;
-      notifyListeners history.listeners action location;
-    }
-  };
+/**
+ * Returns true if a given popstate event is an extraneous WebKit event.
+ * Accounts for the fact that Chrome on iOS fires real popstate events
+ * containing undefined state when pressing the back button.
+ */
+ let handlePopEvent history popEvent => {
+   switch (Js.Undefined.to_opt popEvent##state) {
+     | None => ()
+     | Some state => {
+        let action = Pop;
+        let location = getDomLocation state##key (Some state);
+        history.location = location;
+        history.action = action;
+        notifyListeners history.listeners action location;
+     }
+   };
 };
 
 let change ::forceRefresh=false history action path state=> {
@@ -161,6 +166,9 @@ let replace ::forceRefresh=false ::state=? history path =>
 let createBrowserHistory ::keyLength=8 ::forceRefresh=false () => {
   let key = createKey length::keyLength();
   let initLocation = getDomLocation key None;
+
+  /* Set initial history.state  */
+  Browser.History.replaceState {"key": key, "state": None} Js.Null.empty Browser.location##href;
 
   let history = {
     length: 0,
