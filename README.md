@@ -47,7 +47,7 @@ let unblock = History.block history (fun _action _location => {
   /* or */
   Block
   /* or */
-  Skip
+  Pass
 });
 
 /* This will show a prompt before transitioning */
