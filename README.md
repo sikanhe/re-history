@@ -34,6 +34,7 @@ let logState = fun
 | None => Js.log "No state";
 
 let history = History.createBrowserHistory ();
+
 let unsub = History.subscribe history (fun action location => {
   Js.log (actionToString action);
   Js.log location.key;
