@@ -126,13 +126,9 @@ let handlePopEvent history event => {
 };
 
 let change ::forceRefresh=false history action path state=> {
-  let { keyLength, listeners, blockers, location: prevLocation } = history;
+  let { keyLength, listeners, blockers} = history;
   let key = createKey length::keyLength ();
-  let newState = switch state {
-    | Some _state => state
-    | None => prevLocation.state
-  };
-  let newLocation = createLocation path key newState;
+  let newLocation = createLocation path key state;
   let shouldRefresh = forceRefresh || history.forceRefresh;
   let shouldContinue = checkWithBlockers blockers action newLocation;
 
