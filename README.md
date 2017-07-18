@@ -22,25 +22,31 @@ blocker functions (Prompt message | Block| Pass);
 # Example Usage
 
 ```reason
-open History;
 
 /* Example usages  */
+
+/* state could be anything but you must define its type before calling createBrowserHistory */
 type state = {mystate: string};
 
-let history = createBrowserHistory ();
-let unsub = subscribe history (fun action location => {
+/* location.state is a variant of | Some state and | None  */
+let logState = fun
+| Some {mystate: value} => Js.log "Current state value: " ^ value
+| None => Js.log "No state";
+
+let history = History.createBrowserHistory ();
+let unsub = History.subscribe history (fun action location => {
   Js.log (actionToString action);
   Js.log location.key;
-  /* location.state is a variant of | Some state and | None  */
-  switch location.state {
-  | Some {mystate: state} => Js.log state;
-  | None => Js.log "no state";
-  }
+  logState location.state
 });
 
-/* callback function can return either | Prompt message | Block | Skip  */
-let unblock = block history (fun action location => {
-  Prompt ("You sure you want to" ^ actionToString(action) ^ "to " ^ createHref(location) ^ "?");
+let unblock = History.block history (fun _action _location => {
+  /* Callback function can return either */
+  Prompt "You sure you sure??";
+  /* or */
+  Block
+  /* or */
+  Skip
 });
 
 /* This will show a prompt before transitioning */
