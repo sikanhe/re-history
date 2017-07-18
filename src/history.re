@@ -32,7 +32,7 @@ type t 'a = {
   forceRefresh: bool
 };
 
-let getDomLocation key state=> {
+let createLocationFromDOM key state=> {
   let browserLocation = Browser.location;
   {
     pathname: browserLocation##pathname,
@@ -115,7 +115,7 @@ let goForward () => go 1;
      | None => ()
      | Some state => {
         let action = Pop;
-        let location = getDomLocation state##key state##state;
+        let location = createLocationFromDOM state##key state##state;
 
         if (checkWithBlockers history.blockers action location) {
           history.location = location;
@@ -164,7 +164,7 @@ let replace ::forceRefresh=false ::state=? history path =>
 
 let createBrowserHistory ::keyLength=8 ::forceRefresh=false () => {
   let key = createKey length::keyLength ();
-  let initLocation = getDomLocation key None;
+  let initLocation = createLocationFromDOM key None;
 
   /* Set initial history.state  */
   Browser.History.replaceState {"key": key, "state": None} Js.Null.empty Browser.location##href;
